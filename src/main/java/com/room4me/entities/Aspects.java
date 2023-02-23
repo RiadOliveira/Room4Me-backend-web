@@ -3,15 +3,41 @@ package com.room4me.entities;
 import java.util.Date;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "aspects")
 public class Aspects {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private int bedroomsQuantity;
-    private boolean availableToShare;
-    private String description; 
-    private int capacity;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Property property;
 
+    private boolean shareWithSameGender;
+    private boolean acceptAnimals;
+    private boolean hasGarage;
+    private boolean furnished;
+
+    private int bathroomsQuantity;
+    private int bedroomsQuantity;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private Date createdAt;
+
+    @UpdateTimestamp
     private Date updatedAt;
 
     public Aspects() {
@@ -19,15 +45,20 @@ public class Aspects {
     }
 
     public Aspects(
-        UUID id, int bedroomsQuantity,
-        boolean availableToShare, String description,
-        int capacity, Date createdAt, Date updatedAt
+        UUID id, Property property,
+        boolean shareWithSameGender, boolean acceptAnimals,
+        boolean hasGarage, boolean furnished,
+        int bathroomsQuantity, int bedroomsQuantity,
+        Date createdAt, Date updatedAt
     ) {
         this.id = id;
+        this.property = property;
+        this.shareWithSameGender = shareWithSameGender;
+        this.acceptAnimals = acceptAnimals;
+        this.hasGarage = hasGarage;
+        this.furnished = furnished;
+        this.bathroomsQuantity = bathroomsQuantity;
         this.bedroomsQuantity = bedroomsQuantity;
-        this.availableToShare = availableToShare;
-        this.description = description;
-        this.capacity = capacity;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -40,36 +71,60 @@ public class Aspects {
         this.id = id;
     }
 
+    public Property getProperty() {
+        return property;
+    }
+
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    public boolean isShareWithSameGender() {
+        return shareWithSameGender;
+    }
+
+    public void setShareWithSameGender(boolean shareWithSameGender) {
+        this.shareWithSameGender = shareWithSameGender;
+    }
+
+    public boolean isAcceptAnimals() {
+        return acceptAnimals;
+    }
+
+    public void setAcceptAnimals(boolean acceptAnimals) {
+        this.acceptAnimals = acceptAnimals;
+    }
+
+    public boolean isHasGarage() {
+        return hasGarage;
+    }
+
+    public void setHasGarage(boolean hasGarage) {
+        this.hasGarage = hasGarage;
+    }
+
+    public boolean isFurnished() {
+        return furnished;
+    }
+
+    public void setFurnished(boolean furnished) {
+        this.furnished = furnished;
+    }
+
+    public int getBathroomsQuantity() {
+        return bathroomsQuantity;
+    }
+
+    public void setBathroomsQuantity(int bathroomsQuantity) {
+        this.bathroomsQuantity = bathroomsQuantity;
+    }
+
     public int getBedroomsQuantity() {
         return bedroomsQuantity;
     }
 
     public void setBedroomsQuantity(int bedroomsQuantity) {
         this.bedroomsQuantity = bedroomsQuantity;
-    }
-
-    public boolean isAvailableToShare() {
-        return availableToShare;
-    }
-
-    public void setAvailableToShare(boolean availableToShare) {
-        this.availableToShare = availableToShare;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
     }
 
     public Date getCreatedAt() {

@@ -3,15 +3,42 @@ package com.room4me.entities;
 import java.util.Date;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "questions")
 public class Question {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
-    private String content;
+    @ManyToOne
     private User questioner;
-    private Apartment apartment;
-    private String answer = null;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Property property;
+
+    @Column(nullable = false)
+    private String content;
+
+    @Column(nullable = true)
+    private String answer;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private Date createdAt;
+
+    @UpdateTimestamp
     private Date updatedAt;
     
     public Question() {
@@ -19,14 +46,14 @@ public class Question {
     }
 
     public Question(
-        UUID id, String content, User questioner,
-        Apartment apartment, String answer,
-        Date createdAt, Date updatedAt
+        UUID id, User questioner, Property property,
+        String content, String answer, Date createdAt,
+        Date updatedAt
     ) {
         this.id = id;
-        this.content = content;
         this.questioner = questioner;
-        this.apartment = apartment;
+        this.property = property;
+        this.content = content;
         this.answer = answer;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -40,14 +67,6 @@ public class Question {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public User getQuestioner() {
         return questioner;
     }
@@ -56,12 +75,20 @@ public class Question {
         this.questioner = questioner;
     }
 
-    public Apartment getApartment() {
-        return apartment;
+    public Property getProperty() {
+        return property;
     }
 
-    public void setApartment(Apartment apartment) {
-        this.apartment = apartment;
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getAnswer() {

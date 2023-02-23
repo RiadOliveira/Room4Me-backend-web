@@ -1,39 +1,82 @@
 package com.room4me.entities;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.room4me.enumerators.Gender;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="users")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
-	private String name;
+    @OneToOne(
+        mappedBy = "user", cascade = CascadeType.REMOVE,
+        fetch = FetchType.LAZY
+    )
+    private Contact contact;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
+    private Set<Property> properties;
+
+    @Column(unique = true, nullable = false)
 	private String email;
-    private String phoneNumber;
-    private String avatar;
+
+    @Column(nullable = false)
+	private String name;
+
+    @Column(nullable = false)
 	private String password;
+    
+    @Column(nullable = false)
     private Gender gender;
 
+    @Column(nullable = true)
+    private String avatar;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private Date createdAt;
+
+    @UpdateTimestamp
     private Date updatedAt;
-    
+
     public User() {
         super();
     }
 
     public User(
-        UUID id, String name, String email,
-        String phoneNumber, String avatar, String password,
-        Gender gender, Date createdAt, Date updatedAt
+        UUID id, Contact contact,
+        Set<Property> properties, String email,
+        String name, String password,
+        Gender gender, String avatar,
+        Date createdAt, Date updatedAt
     ) {
         this.id = id;
-        this.name = name;
+        this.contact = contact;
+        this.properties = properties;
         this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.avatar = avatar;
+        this.name = name;
         this.password = password;
         this.gender = gender;
+        this.avatar = avatar;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -46,12 +89,20 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Contact getContact() {
+        return contact;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
+
+    public Set<Property> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Set<Property> properties) {
+        this.properties = properties;
     }
 
     public String getEmail() {
@@ -62,20 +113,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getName() {
+        return name;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {
@@ -92,6 +135,14 @@ public class User {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public Date getCreatedAt() {
