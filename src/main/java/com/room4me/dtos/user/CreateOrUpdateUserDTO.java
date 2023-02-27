@@ -28,7 +28,6 @@ public class CreateOrUpdateUserDTO {
 
     private String avatar;
 
-    @NotEmpty(message = "Gender required")
     @NotNull(message = "Gender required")
     private Gender gender;
 
