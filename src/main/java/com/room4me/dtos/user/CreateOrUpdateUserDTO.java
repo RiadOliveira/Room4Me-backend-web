@@ -3,25 +3,18 @@ package com.room4me.dtos.user;
 import com.room4me.enumerators.Gender;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class CreateOrUpdateUserDTO {
-    @NotEmpty(message = "User name required")
-    @NotNull(message = "User name required")
+    @NotBlank(message = "User name required")
     private String name;
 
-    @NotEmpty(message = "E-mail required")
-    @NotNull(message = "E-mail required")
+    @NotBlank(message = "E-mail required")
     @Email(message = "Invalid e-mail format")
     private String email;
 
-    @NotEmpty(message = "Phone number required")
-    @NotNull(message = "Phone number required")
-    private String phoneNumber;
-
-    @NotEmpty(message = "Password required")
     @NotNull(message = "Password required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
@@ -37,12 +30,11 @@ public class CreateOrUpdateUserDTO {
 
     public CreateOrUpdateUserDTO(
         String name, String email,
-        String phoneNumber, String avatar,
-        String password, Gender gender
+        String avatar, String password,
+        Gender gender
     ) {
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.avatar = avatar;
         this.password = password;
         this.gender = gender;
@@ -62,14 +54,6 @@ public class CreateOrUpdateUserDTO {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     public String getAvatar() {

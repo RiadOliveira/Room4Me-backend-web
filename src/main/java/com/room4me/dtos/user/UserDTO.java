@@ -10,7 +10,6 @@ public class UserDTO {
 
     private String name;
     private String email;
-    private String phoneNumber;
     private String avatar;
     private Gender gender;
 
@@ -23,13 +22,12 @@ public class UserDTO {
 
     public UserDTO(
         UUID id, String name, String email,
-        String phoneNumber, String avatar,
-        Gender gender, Date createdAt, Date updatedAt
+        String avatar, Gender gender,
+        Date createdAt, Date updatedAt
     ) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.avatar = avatar;
         this.gender = gender;
         this.createdAt = createdAt;
@@ -58,14 +56,6 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     public String getAvatar() {
