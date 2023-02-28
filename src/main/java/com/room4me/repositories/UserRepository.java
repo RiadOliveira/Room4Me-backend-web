@@ -6,4 +6,5 @@ import com.room4me.entities.User;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
+    User findByEmail(String email);
 }

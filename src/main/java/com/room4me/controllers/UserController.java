@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.room4me.dtos.user.CreateOrUpdateUserDTO;
+import com.room4me.dtos.user.LoginDTO;
 import com.room4me.dtos.user.UserDTO;
 import com.room4me.services.UserServices;
 
@@ -26,5 +27,13 @@ public class UserController {
     ) {
         UserDTO response = userServices.createUser(userToCreate);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/sessions")
+    public ResponseEntity<?> createUser(
+        @Valid @RequestBody LoginDTO loginData
+    ) {
+        UserDTO response = userServices.createSessions(loginData);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

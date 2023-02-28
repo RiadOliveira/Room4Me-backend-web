@@ -3,6 +3,7 @@ package com.room4me.errors;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
@@ -34,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             message += errors.get(ind).getDefaultMessage();
         }
 
-        ExceptionResponse errorResponse = new ExceptionResponse(status.value(), message);
+        ExceptionResponse errorResponse = new ExceptionResponse(HttpStatus.BAD_REQUEST, message);
 		return new ResponseEntity<>(errorResponse, status);
 	}
 }

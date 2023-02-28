@@ -2,29 +2,29 @@ package com.room4me.errors;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.http.HttpStatus;
 
 public class ExceptionResponse {
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
-    private LocalDateTime timestamp;
-    
+    private HttpStatus error;
+    private String timestamp;
+    private String message;
     private int status;
-    private String error;
 
-    public ExceptionResponse(int status, String error) {
-        this.status = status;
+    public ExceptionResponse(HttpStatus error, String message) {
         this.error = error;
-        this.timestamp = LocalDateTime.now();
+        this.status = error.value();
+        this.message = message;
+        this.timestamp = LocalDateTime.now().toString();
     }
 
     public static ExceptionResponse FromServerException(ServerException exception) {
-        int status = exception.getHttpCode().value();
+        HttpStatus httpCode = exception.getHttpCode();
         String message = exception.getMessage();
 
-        return new ExceptionResponse(status, message);
+        return new ExceptionResponse(httpCode, message);
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
@@ -36,11 +36,23 @@ public class ExceptionResponse {
         this.status = status;
     }
 
-    public String getError() {
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public HttpStatus getError() {
         return error;
     }
 
-    public void setError(String error) {
+    public void setError(HttpStatus error) {
         this.error = error;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }   
 }
