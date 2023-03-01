@@ -1,6 +1,7 @@
 package com.room4me.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import com.room4me.dtos.user.CreateOrUpdateUserDTO;
 import com.room4me.dtos.user.LoginDTO;
 import com.room4me.dtos.user.UserDTO;
 import com.room4me.services.UserServices;
+import com.room4me.utils.JwtUtils;
 
 import jakarta.validation.Valid;
 
@@ -30,10 +32,24 @@ public class UserController {
     }
 
     @PostMapping("/sessions")
-    public ResponseEntity<?> createUser(
+    public ResponseEntity<?> createSessions(
         @Valid @RequestBody LoginDTO loginData
     ) {
         UserDTO response = userServices.createSessions(loginData);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String token = JwtUtils.generateToken(response.getId().toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(
+            "Authorization",
+            JwtUtils.TOKEN_PREFIX + " " + token
+        );
+        headers.set(
+            "Access-Control-Expose-Headers",
+            "Authorization"
+        );
+
+        return ResponseEntity.status(
+            HttpStatus.OK
+        ).headers(headers).body(response);
     }
 }

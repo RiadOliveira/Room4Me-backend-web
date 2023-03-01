@@ -3,22 +3,18 @@ package com.room4me.filters;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.room4me.errors.ExceptionResponse;
 import com.room4me.services.AuthenticationServices;
+import com.room4me.utils.AuthorizationExceptionParser;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Component
 public class AuthorizationFilter extends OncePerRequestFilter {
     @Autowired
     private AuthenticationServices authenticationServices;
@@ -40,23 +36,19 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     
             filterChain.doFilter(request, response);
         } catch(Exception exception) {
-            parseFilterException(request, response, exception);
+            AuthorizationExceptionParser.parseAuthorizationException(
+                request, response, exception
+            );
         }
     }
 
-    private void parseFilterException(
-		HttpServletRequest request, HttpServletResponse response,
-        Exception exception
-	) throws ServletException, IOException {
-        String parsedMessage = exception.getMessage().split(" Current")[0];
-        ExceptionResponse parsedException = new ExceptionResponse(
-            HttpStatus.FORBIDDEN, parsedMessage
-        );
-            
-        ObjectMapper mapper = new ObjectMapper();
-        response.setStatus(403);
-		response.getWriter().write(
-			mapper.writeValueAsString(parsedException)
-		);
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String method = request.getMethod();
+        if(method.equals("GET")) return true;
+
+        String path = request.getRequestURI();
+        if(method.equals("POST") && path.startsWith("/user")) return true;
+
+        return false;
 	}
 }

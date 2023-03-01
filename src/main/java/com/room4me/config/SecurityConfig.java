@@ -2,6 +2,7 @@ package com.room4me.config;
 
 import java.util.Arrays;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,23 +14,21 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.room4me.filters.AuthenticationExceptionFilter;
 import com.room4me.filters.AuthorizationFilter;
-import com.room4me.filters.SessionsFilter;
 import com.room4me.services.AuthenticationServices;
-
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Autowired
-    private AuthorizationFilter authorizationFilter;
-
     @Autowired
     private AuthenticationServices authenticationServices;
 
@@ -48,14 +47,13 @@ public class SecurityConfig {
         .cors().and().csrf().disable()
         .authorizeHttpRequests()
         .requestMatchers(HttpMethod.GET).permitAll()
-        .requestMatchers(HttpMethod.POST, "/user**").permitAll()
+        .requestMatchers(HttpMethod.POST, "/user/**").permitAll()
         .anyRequest().authenticated().and()
+        .exceptionHandling().authenticationEntryPoint(authenticationExceptionFilter()).and()
         .addFilterBefore(
-            new SessionsFilter(
-                "/user/sessions", authenticationManager
-            ), UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
-        .authenticationManager(authenticationManager)
+            authorizationFilter(),
+            UsernamePasswordAuthenticationFilter.class
+        ).authenticationManager(authenticationManager)
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.headers().frameOptions().disable();
@@ -79,5 +77,20 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Bean
+    public OncePerRequestFilter authorizationFilter() {
+        return new AuthorizationFilter();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationExceptionFilter() {
+        return new AuthenticationExceptionFilter();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }
