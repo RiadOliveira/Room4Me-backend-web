@@ -16,7 +16,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtUtils {
 	private static final long EXPIRATION_TIME = 1_800_000;
 	private static final String SIGN_IN_KEY = "aa52d27b59c5f8cdc38dbbcfd53f8cac";
-    public static final String TOKEN_PREFIX = "Bearer";
 
 	public static String generateToken(String data) {
 		return Jwts.builder().setSubject(data)

@@ -28,8 +28,8 @@ public class User {
 	private UUID id;
 
     @OneToOne(
-        mappedBy = "user", cascade = CascadeType.REMOVE,
-        fetch = FetchType.LAZY
+        mappedBy = "user", cascade = CascadeType.ALL,
+        orphanRemoval = true, fetch = FetchType.LAZY
     )
     private Contact contact;
 

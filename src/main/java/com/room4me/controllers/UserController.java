@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -44,7 +45,7 @@ public class UserController {
         HttpHeaders headers = new HttpHeaders();
         headers.set(
             "Authorization",
-            JwtUtils.TOKEN_PREFIX + " " + token
+            token
         );
         headers.set(
             "Access-Control-Expose-Headers",
@@ -65,5 +66,13 @@ public class UserController {
             userId, userToUpdate
         );
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<?> deleteUser(
+        @RequestAttribute UUID userId
+    ) {
+        userServices.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

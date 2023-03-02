@@ -78,7 +78,7 @@ public class UserServices {
         boolean isContactEmail
     ) {
         if(updatedEmail == null) return;
-        if(originalEmail.equals(updatedEmail)) return;
+        if(originalEmail != null && originalEmail.equals(updatedEmail)) return;
 
         boolean emailExists = false;
         if(isContactEmail) {
@@ -100,7 +100,7 @@ public class UserServices {
 
     private UserDTO getUpdatedUserDTO(
         UserDTO userToUpdate, User userEntity
-    ) throws IllegalAccessException {
+    ) {
         UserDTO mappedEntity = mapper.map(userEntity, UserDTO.class);
         if(userToUpdate == null) return mappedEntity;
 
@@ -109,19 +109,26 @@ public class UserServices {
             false
         );
 
-        mappedEntity.setAvatar(userToUpdate.getAvatar());
-        ObjectPropsInjector.injectFromAnotherObject(
-            userToUpdate, userEntity
-        );
-
-        return userToUpdate;
+        try {
+            mappedEntity.setAvatar(userToUpdate.getAvatar());
+            ObjectPropsInjector.injectFromAnotherObject(
+                userToUpdate, mappedEntity
+            );
+    
+            return userToUpdate;
+        } catch (Exception exception) {
+            throw new ServerException(
+                "Internal Server Error",
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     private void verifyInstagramUpdate(
         String updatedInstagram, String originalInstagram
     ) {
         if(updatedInstagram == null) return;
-        if(originalInstagram.equals(updatedInstagram)) return;
+        if(originalInstagram != null && originalInstagram.equals(updatedInstagram)) return;
 
         boolean instagramExists = contactRepository.existsByInstagram(
             updatedInstagram
@@ -135,9 +142,13 @@ public class UserServices {
 
     private ContactDTO getUpdatedContactDTO(
         ContactDTO contactToUpdate, Contact contactEntity
-    ) throws IllegalAccessException {
-        ContactDTO mappedEntity = mapper.map(contactEntity, ContactDTO.class);
-        if(contactToUpdate == null) return mappedEntity;
+    ) {
+        boolean entityIsNull = contactEntity == null;
+        if(contactToUpdate == null && entityIsNull) return null;
+
+        ContactDTO mappedEntity = entityIsNull ? 
+            new ContactDTO() : mapper.map(contactEntity, ContactDTO.class);
+        if(contactEntity != null && contactToUpdate == null) return mappedEntity;
 
         verifyEmailUpdate(
             contactToUpdate.getEmail(), mappedEntity.getEmail(),
@@ -147,10 +158,19 @@ public class UserServices {
             contactToUpdate.getInstagram(), mappedEntity.getInstagram()
         );
 
-        ObjectPropsInjector.injectFromAnotherObject(
-            contactToUpdate, contactEntity
-        );
-        return contactToUpdate;
+        try {
+            if(!entityIsNull) {
+                ObjectPropsInjector.injectFromAnotherObject(
+                    contactToUpdate, mappedEntity
+                );
+            }
+            return contactToUpdate;
+        } catch (Exception exception) {
+            throw new ServerException(
+                "Internal Server Error",
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public UserWithContactDTO updateUser(
@@ -159,31 +179,29 @@ public class UserServices {
         User findedUser = userRepository.findByIdWithContact(userId);
         if(findedUser == null) {
             throw new ServerException(
-                "User not found",
-                HttpStatus.NOT_FOUND
+                "User not found", HttpStatus.NOT_FOUND
             );
         }
 
-        try {
-            UserDTO updatedUser = getUpdatedUserDTO(
-                userToUpdate.getUser(), findedUser
-            );
-            userToUpdate.setUser(updatedUser);
+        UserDTO updatedUser = getUpdatedUserDTO(
+            userToUpdate.getUser(), findedUser
+        );
+        ContactDTO updatedContact = getUpdatedContactDTO(
+            userToUpdate.getContact(), findedUser.getContact()
+        );
 
-            ContactDTO updatedContact = getUpdatedContactDTO(
-                userToUpdate.getContact(), findedUser.getContact()
-            );
-
-            UserWithContactDTO updatedUserWithContact = new UserWithContactDTO();
-            updatedUserWithContact.setUser(updatedUser);
-            updatedUserWithContact.setContact(updatedContact);
-    
-            User updatedEntity = mapper.map(updatedUserWithContact, User.class);
-            return mapper.map(updatedEntity, UserWithContactDTO.class);
-        } catch (Exception exception) {
-            throw new ServerException(
-                "Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR
-            );
+        User updatedUserEntity = mapper.map(updatedUser, User.class);
+        if(updatedContact != null) {
+            Contact contactEntity = mapper.map(updatedContact, Contact.class);
+            updatedUserEntity.setContact(contactEntity);
+            contactEntity.setUser(updatedUserEntity);
         }
+
+        updatedUserEntity = userRepository.save(updatedUserEntity);
+        return mapper.map(updatedUserEntity, UserWithContactDTO.class);
+    }
+
+    public void deleteUser(UUID userId) {
+        userRepository.deleteById(userId);
     }
 }
