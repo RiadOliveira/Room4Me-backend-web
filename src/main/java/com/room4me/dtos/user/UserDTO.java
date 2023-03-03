@@ -25,7 +25,7 @@ public class UserDTO {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    private String avatar;
+    private String avatarFileName;
 
     @NotNull(message = "Gender required")
     private Gender gender;
@@ -45,13 +45,13 @@ public class UserDTO {
 
     public UserDTO(
         String name, String email, String password,
-        String avatar, Gender gender, UUID id,
+        String avatarFileName, Gender gender, UUID id,
         Date createdAt, Date updatedAt
     ) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.avatar = avatar;
+        this.avatarFileName = avatarFileName;
         this.gender = gender;
         this.id = id;
         this.createdAt = createdAt;
@@ -82,12 +82,12 @@ public class UserDTO {
         this.password = password;
     }
 
-    public String getAvatar() {
-        return avatar;
+    public String getAvatarFileName() {
+        return avatarFileName;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setAvatarFileName(String avatarFileName) {
+        this.avatarFileName = avatarFileName;
     }
 
     public Gender getGender() {

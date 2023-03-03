@@ -1,5 +1,6 @@
 package com.room4me.services;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.room4me.dtos.user.ContactDTO;
 import com.room4me.dtos.user.LoginDTO;
@@ -14,6 +16,7 @@ import com.room4me.dtos.user.UserDTO;
 import com.room4me.dtos.user.UserWithContactDTO;
 import com.room4me.entities.Contact;
 import com.room4me.entities.User;
+import com.room4me.enumerators.FileType;
 import com.room4me.errors.ServerException;
 import com.room4me.repositories.ContactRepository;
 import com.room4me.repositories.UserRepository;
@@ -31,13 +34,17 @@ public class UserServices {
 	private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private FileServices fileServices;
+
+    @Autowired
     private ModelMapper mapper;
 
-    public UserDTO createUser(UserDTO userToCreate) {
+    public UserDTO createUser(
+        UserDTO userToCreate, Optional<MultipartFile> avatar
+    ) {
         boolean emailExists = userRepository.existsByEmail(
             userToCreate.getEmail()
         );
-
         if(emailExists) {
             throw new ServerException(
                 "An user with this email already exists"
@@ -49,6 +56,15 @@ public class UserServices {
         );
         User userEntity = mapper.map(userToCreate, User.class);
         userEntity = userRepository.save(userEntity);
+
+        if(avatar.isPresent()) {
+            String parsedFileName = userEntity.getId().toString()
+                + avatar.get().getOriginalFilename().replace(" ", "-");
+
+            fileServices.saveFile(avatar.get(), FileType.Avatar, parsedFileName);
+            userEntity.setAvatarFileName(parsedFileName);
+            userRepository.save(userEntity);
+        }
 
         return mapper.map(userEntity, UserDTO.class);
     }
@@ -110,7 +126,7 @@ public class UserServices {
         );
 
         try {
-            mappedEntity.setAvatar(userToUpdate.getAvatar());
+            mappedEntity.setAvatarFileName(userToUpdate.getAvatarFileName());
             ObjectPropsInjector.injectFromAnotherObject(
                 userToUpdate, mappedEntity
             );
@@ -202,6 +218,18 @@ public class UserServices {
     }
 
     public void deleteUser(UUID userId) {
+        User findedUser = userRepository.findById(userId).orElse(null);
+        if(findedUser == null) {
+            throw new ServerException(
+                "User not found", HttpStatus.NOT_FOUND
+            );
+        }
+
+        String avatar = findedUser.getAvatarFileName();
+        if(avatar != null) {
+            fileServices.delete(avatar, FileType.Avatar);
+        }
+
         userRepository.deleteById(userId);
     }
 }
