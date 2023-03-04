@@ -63,34 +63,31 @@ public class UserController {
         ).headers(headers).body(response);
     }
 
-    // @PutMapping(path = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    // public ResponseEntity<?> updateUser(
-    //     @RequestAttribute UUID userId,
-    //     @Valid @ModelAttribute UserDTO userToUpdate,
-    //     @RequestParam("avatar") Optional<MultipartFile> avatar
-    // ) {
-    //     UserDTO response = userServices.updateUser(
-    //         userId, userToUpdate, avatar
-    //     );
-    //     return ResponseEntity.status(HttpStatus.OK).body(response);
-    // }
-
-    // @PutMapping("/contact")
-    // public ResponseEntity<?> createOrUpdateContact(
-    //     @RequestAttribute UUID userId,
-    //     @Valid @RequestBody ContactDTO userContact
-    // ) {
-    //     ContactDTO response = userServices.createOrUpdateContact(
-    //         userId, userContact
-    //     );
-    //     return ResponseEntity.status(HttpStatus.OK).body(response);
-    // }
+    @PutMapping(path = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateUser(
+        @RequestAttribute UUID userId,
+        @Valid @ModelAttribute UserDTO userToUpdate,
+        @RequestParam("avatar") Optional<MultipartFile> avatar
+    ) {
+        UserDTO response = userServices.updateUser(
+            userId, userToUpdate, avatar
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @DeleteMapping("")
     public ResponseEntity<?> deleteUser(
         @RequestAttribute UUID userId
     ) {
         userServices.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/avatar")
+    public ResponseEntity<?> deleteAvatar(
+        @RequestAttribute UUID userId
+    ) {
+        userServices.deleteAvatar(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

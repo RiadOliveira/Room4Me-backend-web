@@ -10,15 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.room4me.dtos.user.ContactDTO;
 import com.room4me.dtos.user.LoginDTO;
 import com.room4me.dtos.user.UserDTO;
-import com.room4me.entities.Contact;
 import com.room4me.entities.User;
 import com.room4me.errors.ServerException;
-import com.room4me.repositories.ContactRepository;
 import com.room4me.repositories.UserRepository;
-import com.room4me.utils.ImageUtils;
 import com.room4me.utils.ObjectPropsInjector;
 
 @Service
@@ -27,13 +23,13 @@ public class UserServices {
     private UserRepository userRepository;
 
     @Autowired
-    private ContactRepository contactRepository;
-
-    @Autowired
 	private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ModelMapper mapper;
+
+    @Autowired
+    private FileAPIServices fileAPIServices;
 
     public UserDTO createUser(
         UserDTO userToCreate, Optional<MultipartFile> avatar
@@ -47,26 +43,23 @@ public class UserServices {
             );
         }
 
-        String avatarBase64 = null;
         userToCreate.setPassword(
             passwordEncoder.encode(userToCreate.getPassword())
         );
-        User userEntity = mapper.map(userToCreate, User.class);
-        
+        String avatarUrl = null;
+
         if(avatar.isPresent()) {
-            byte[] avatarBytes = ImageUtils.getBytes(avatar.get());
-            String type = avatar.get().getContentType().split("/")[1];
-            
-            avatarBase64 = ImageUtils.convertBytesToBase64(avatarBytes, type);
-            userEntity.setAvatarBytes(avatarBytes);
-            userEntity.setAvatarType(type);
+            avatarUrl = fileAPIServices.sendFile(avatar.get());
+            userToCreate.setAvatarLink(
+                fileAPIServices.getUniqueLinkPart(avatarUrl)
+            );
         }
 
+        User userEntity = mapper.map(userToCreate, User.class);
         userEntity = userRepository.save(userEntity);
-        UserDTO createdUser = mapper.map(userEntity, UserDTO.class);
-        createdUser.setAvatarBase64(avatarBase64);
-
-        return createdUser;
+        userEntity.setAvatarLink(avatarUrl);
+        
+        return mapper.map(userEntity, UserDTO.class);
     }
 
     public UserDTO createSessions(LoginDTO loginData) {
@@ -86,27 +79,21 @@ public class UserServices {
             );
         }
 
+        findedUser.setAvatarLink(
+            fileAPIServices.getFullLinkFromUniquePart(findedUser.getAvatarLink())
+        );
         return mapper.map(findedUser, UserDTO.class);
     }
 
     private void verifyEmailUpdate(
-        String updatedEmail, String originalEmail,
-        boolean isContactEmail
+        String updatedEmail, String originalEmail
     ) {
         if(updatedEmail == null) return;
         if(originalEmail != null && originalEmail.equals(updatedEmail)) return;
 
-        boolean emailExists = false;
-        if(isContactEmail) {
-            emailExists = contactRepository.existsByEmail(
-                updatedEmail
-            );
-        } else {
-            emailExists = userRepository.existsByEmail(
-                updatedEmail
-            );
-        }
-
+        boolean emailExists = userRepository.existsByEmail(
+            updatedEmail
+        );
         if(emailExists) {
             throw new ServerException(
                 "An account with this email already exists"
@@ -114,89 +101,61 @@ public class UserServices {
         }
     }
 
-    private void verifyInstagramUpdate(
-        String updatedInstagram, String originalInstagram
+    public UserDTO updateUser(
+        UUID userId, UserDTO userToUpdate,
+        Optional<MultipartFile> avatar
     ) {
-        if(updatedInstagram == null) return;
-        if(originalInstagram != null && originalInstagram.equals(updatedInstagram)) return;
-
-        boolean instagramExists = contactRepository.existsByInstagram(
-            updatedInstagram
-        );
-        if(instagramExists) {
+        User findedUser = userRepository.findById(userId).orElse(null);
+        if(findedUser == null) {
             throw new ServerException(
-                "A contact with this instagram already exists"
+                "User not found", HttpStatus.NOT_FOUND
             );
         }
+
+        verifyEmailUpdate(
+            userToUpdate.getEmail(), findedUser.getEmail()
+        );
+        UserDTO mappedEntity = mapper.map(findedUser, UserDTO.class);
+
+        String fullUrl = fileAPIServices.getFullLinkFromUniquePart(
+            mappedEntity.getAvatarLink()
+        );
+        if(avatar.isPresent()) {
+            fullUrl = fileAPIServices.sendFile(avatar.get());
+            mappedEntity.setAvatarLink(
+                fileAPIServices.getUniqueLinkPart(fullUrl)
+            );
+        }
+
+        if(userToUpdate.getPassword() != null) {
+            userToUpdate.setPassword(
+                passwordEncoder.encode(userToUpdate.getPassword())
+            );
+        }
+        ObjectPropsInjector.injectFromAnotherObject(
+            userToUpdate, mappedEntity
+        );
+
+        User updatedUserEntity = mapper.map(userToUpdate, User.class);
+        updatedUserEntity = userRepository.save(updatedUserEntity);
+        updatedUserEntity.setAvatarLink(fullUrl);
+
+        return mapper.map(updatedUserEntity, UserDTO.class);
     }
-
-    // private ContactDTO getUpdatedContactDTO(
-    //     ContactDTO contactToUpdate, Contact contactEntity
-    // ) {
-    //     boolean entityIsNull = contactEntity == null;
-    //     if(contactToUpdate == null && entityIsNull) return null;
-
-    //     ContactDTO mappedEntity = entityIsNull ? 
-    //         new ContactDTO() : mapper.map(contactEntity, ContactDTO.class);
-    //     if(contactEntity != null && contactToUpdate == null) return mappedEntity;
-
-    //     verifyEmailUpdate(
-    //         contactToUpdate.getEmail(), mappedEntity.getEmail(),
-    //         true
-    //     );
-    //     verifyInstagramUpdate(
-    //         contactToUpdate.getInstagram(), mappedEntity.getInstagram()
-    //     );
-
-    //     try {
-    //         if(!entityIsNull) {
-    //             ObjectPropsInjector.injectFromAnotherObject(
-    //                 contactToUpdate, mappedEntity
-    //             );
-    //         }
-    //         return contactToUpdate;
-    //     } catch (Exception exception) {
-    //         throw ServerException.INTERNAL_SERVER_EXCEPTION;
-    //     }
-    // }
-
-    // public UserDTO updateUser(
-    //     UUID userId, UserDTO userToUpdate,
-    //     Optional<MultipartFile> avatar
-    // ) {
-    //     User findedUser = userRepository.findById(userId).orElse(null);
-    //     if(findedUser == null) {
-    //         throw new ServerException(
-    //             "User not found", HttpStatus.NOT_FOUND
-    //         );
-    //     }
-        
-    //     verifyEmailUpdate(
-    //         userToUpdate.getEmail(), findedUser.getEmail(),
-    //         false
-    //     );
-
-    //     UserDTO mappedEntity = mapper.map(findedUser, UserDTO.class);
-    //     ObjectPropsInjector.injectFromAnotherObject(
-    //         userToUpdate, mappedEntity
-    //     );
-
-    //     String avatarBase64 = null;
-    //     User updatedUserEntity = mapper.map(userToUpdate, User.class);
-    //     if(avatar.isPresent()) {
-    //         byte[] avatarBytes = ImageUtils.getBytes(avatar.get());
-    //         String type = avatar.get().getContentType().split("/")[1];
-            
-    //         avatarBase64 = ImageUtils.convertBytesToBase64(avatarBytes, type);
-    //         userEntity.setAvatarBytes(avatarBytes);
-    //         userEntity.setAvatarType(type);
-    //     }
-
-    //     updatedUserEntity = userRepository.save(updatedUserEntity);
-    //     return mapper.map(updatedUserEntity, UserDTO.class);
-    // }
 
     public void deleteUser(UUID userId) {
         userRepository.deleteById(userId);
+    }
+
+    public void deleteAvatar(UUID userId) {
+        User findedUser = userRepository.findById(userId).orElse(null);
+        if(findedUser == null) {
+            throw new ServerException(
+                "User not found", HttpStatus.NOT_FOUND
+            );
+        }
+
+        findedUser.setAvatarLink(null);
+        userRepository.save(findedUser);
     }
 }

@@ -49,10 +49,7 @@ public class User {
     private Gender gender;
 
     @Column(nullable = true)
-    private byte[] avatarBytes;
-
-    @Column(nullable = true)
-    private String avatarType;
+    private String avatarLink;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -69,9 +66,8 @@ public class User {
         UUID id, Contact contact,
         Set<Property> properties, String email,
         String name, String password,
-        Gender gender, byte[] avatarBytes,
-        String avatarType, Date createdAt,
-        Date updatedAt
+        Gender gender, String avatarLink,
+        Date createdAt, Date updatedAt
     ) {
         this.id = id;
         this.contact = contact;
@@ -80,8 +76,7 @@ public class User {
         this.name = name;
         this.password = password;
         this.gender = gender;
-        this.avatarBytes = avatarBytes;
-        this.avatarType = avatarType;
+        this.avatarLink = avatarLink;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -142,20 +137,12 @@ public class User {
         this.gender = gender;
     }
 
-    public byte[] getAvatarBytes() {
-        return avatarBytes;
+    public String getAvatarLink() {
+        return avatarLink;
     }
 
-    public void setAvatarBytes(byte[] avatarBytes) {
-        this.avatarBytes = avatarBytes;
-    }
-
-    public String getAvatarType() {
-        return avatarType;
-    }
-
-    public void setAvatarType(String avatarType) {
-        this.avatarType = avatarType;
+    public void setAvatarLink(String avatarLink) {
+        this.avatarLink = avatarLink;
     }
 
     public Date getCreatedAt() {

@@ -32,9 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-### Files Directories ###
-src/main/resources/static/avatar/*
-!src/main/resources/static/avatar/.gitkeep
-
-src/main/resources/static/propertyImage/*
-!src/main/resources/static/propertyImage/.gitkeep
+### Environment Variables ###
+.env

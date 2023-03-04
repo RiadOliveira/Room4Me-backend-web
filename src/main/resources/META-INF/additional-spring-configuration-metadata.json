@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "file.api.key",
+  "type": "java.lang.String",
+  "description": "The file API key"
+}]}

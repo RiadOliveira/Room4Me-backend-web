@@ -26,7 +26,7 @@ public class UserDTO {
     private String password;
 
     @JsonProperty(access = Access.READ_ONLY)
-    private String avatarBase64;
+    private String avatarLink;
 
     @NotNull(message = "Gender required")
     private Gender gender;
@@ -46,13 +46,13 @@ public class UserDTO {
     
     public UserDTO(
         String name, String email, String password,
-        String avatarBase64, Gender gender,
+        String avatarLink, Gender gender,
         UUID id, Date createdAt, Date updatedAt
     ) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.avatarBase64 = avatarBase64;
+        this.avatarLink = avatarLink;
         this.gender = gender;
         this.id = id;
         this.createdAt = createdAt;
@@ -83,12 +83,12 @@ public class UserDTO {
         this.password = password;
     }
 
-    public String getAvatarBase64() {
-        return avatarBase64;
+    public String getAvatarLink() {
+        return avatarLink;
     }
 
-    public void setAvatarBase64(String avatarBase64) {
-        this.avatarBase64 = avatarBase64;
+    public void setAvatarLink(String avatarLink) {
+        this.avatarLink = avatarLink;
     }
     
     public Gender getGender() {
