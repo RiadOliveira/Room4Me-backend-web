@@ -43,23 +43,26 @@ public class UserServices {
             );
         }
 
-        userToCreate.setPassword(
-            passwordEncoder.encode(userToCreate.getPassword())
-        );
         String avatarUrl = null;
-
         if(avatar.isPresent()) {
             avatarUrl = fileAPIServices.sendFile(avatar.get());
             userToCreate.setAvatarLink(
                 fileAPIServices.getUniqueLinkPart(avatarUrl)
             );
         }
+        userToCreate.setPassword(
+            passwordEncoder.encode(userToCreate.getPassword())
+        );
 
         User userEntity = mapper.map(userToCreate, User.class);
         userEntity = userRepository.save(userEntity);
-        userEntity.setAvatarLink(avatarUrl);
+
+        userToCreate.setId(userEntity.getId());
+        userToCreate.setCreatedAt(userEntity.getCreatedAt());
+        userToCreate.setUpdatedAt(userEntity.getUpdatedAt());
+        userToCreate.setAvatarLink(avatarUrl);
         
-        return mapper.map(userEntity, UserDTO.class);
+        return userToCreate;
     }
 
     public UserDTO createSessions(LoginDTO loginData) {
@@ -111,36 +114,37 @@ public class UserServices {
                 "User not found", HttpStatus.NOT_FOUND
             );
         }
-
         verifyEmailUpdate(
             userToUpdate.getEmail(), findedUser.getEmail()
         );
-        UserDTO mappedEntity = mapper.map(findedUser, UserDTO.class);
 
         String fullUrl = fileAPIServices.getFullLinkFromUniquePart(
-            mappedEntity.getAvatarLink()
+            findedUser.getAvatarLink()
         );
         if(avatar.isPresent()) {
             fullUrl = fileAPIServices.sendFile(avatar.get());
-            mappedEntity.setAvatarLink(
+            userToUpdate.setAvatarLink(
                 fileAPIServices.getUniqueLinkPart(fullUrl)
             );
         }
-
         if(userToUpdate.getPassword() != null) {
             userToUpdate.setPassword(
                 passwordEncoder.encode(userToUpdate.getPassword())
             );
         }
+
+        UserDTO mappedEntity = mapper.map(findedUser, UserDTO.class);
         ObjectPropsInjector.injectFromAnotherObject(
             userToUpdate, mappedEntity
         );
 
         User updatedUserEntity = mapper.map(userToUpdate, User.class);
         updatedUserEntity = userRepository.save(updatedUserEntity);
-        updatedUserEntity.setAvatarLink(fullUrl);
 
-        return mapper.map(updatedUserEntity, UserDTO.class);
+        userToUpdate.setUpdatedAt(updatedUserEntity.getUpdatedAt());
+        userToUpdate.setAvatarLink(fullUrl);
+
+        return userToUpdate;
     }
 
     public void deleteUser(UUID userId) {

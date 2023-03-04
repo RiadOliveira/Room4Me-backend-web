@@ -9,8 +9,11 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public class ContactDTO {
+    private static final String PHONE_NUMBER_REGEX = "^\\+\\d{2}\\(\\d{2}\\)\\d{4}-\\d{4}$";
+
     @JsonProperty(access = Access.READ_ONLY)
     private UUID id;
 
@@ -19,9 +22,11 @@ public class ContactDTO {
     private String email;
 
     @NotBlank(message = "Call number required")
+    @Pattern(regexp = PHONE_NUMBER_REGEX, message = "Invalid call number format")
     private String callNumber;
 
     @NotBlank(message = "Whatsapp number required")
+    @Pattern(regexp = PHONE_NUMBER_REGEX, message = "Invalid whatsapp number format")
     private String whatsappNumber;
 
     @URL(message = "Invalid URL format")
