@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.room4me.dtos.user.LoginDTO;
 import com.room4me.dtos.user.UserDTO;
-import com.room4me.dtos.user.UserWithContactDTO;
 import com.room4me.services.UserServices;
 import com.room4me.utils.JwtUtils;
 
@@ -35,7 +34,7 @@ public class UserController {
 
     @PostMapping(path = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createUser(
-        @ModelAttribute @Valid UserDTO userToCreate,
+        @Valid @ModelAttribute UserDTO userToCreate,
         @RequestParam("avatar") Optional<MultipartFile> avatar
     ) {
         UserDTO response = userServices.createUser(userToCreate, avatar);
@@ -64,16 +63,28 @@ public class UserController {
         ).headers(headers).body(response);
     }
 
-    @PutMapping("")
-    public ResponseEntity<?> updateUser(
-        @RequestAttribute UUID userId,
-        @Valid @RequestBody UserWithContactDTO userToUpdate
-    ) {
-        UserWithContactDTO response = userServices.updateUser(
-            userId, userToUpdate
-        );
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+    // @PutMapping(path = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    // public ResponseEntity<?> updateUser(
+    //     @RequestAttribute UUID userId,
+    //     @Valid @ModelAttribute UserDTO userToUpdate,
+    //     @RequestParam("avatar") Optional<MultipartFile> avatar
+    // ) {
+    //     UserDTO response = userServices.updateUser(
+    //         userId, userToUpdate, avatar
+    //     );
+    //     return ResponseEntity.status(HttpStatus.OK).body(response);
+    // }
+
+    // @PutMapping("/contact")
+    // public ResponseEntity<?> createOrUpdateContact(
+    //     @RequestAttribute UUID userId,
+    //     @Valid @RequestBody ContactDTO userContact
+    // ) {
+    //     ContactDTO response = userServices.createOrUpdateContact(
+    //         userId, userContact
+    //     );
+    //     return ResponseEntity.status(HttpStatus.OK).body(response);
+    // }
 
     @DeleteMapping("")
     public ResponseEntity<?> deleteUser(

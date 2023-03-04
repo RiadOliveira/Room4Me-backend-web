@@ -25,7 +25,8 @@ public class UserDTO {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    private String avatarFileName;
+    @JsonProperty(access = Access.READ_ONLY)
+    private String avatarBase64;
 
     @NotNull(message = "Gender required")
     private Gender gender;
@@ -42,16 +43,16 @@ public class UserDTO {
     public UserDTO() {
         super();
     }
-
+    
     public UserDTO(
         String name, String email, String password,
-        String avatarFileName, Gender gender, UUID id,
-        Date createdAt, Date updatedAt
+        String avatarBase64, Gender gender,
+        UUID id, Date createdAt, Date updatedAt
     ) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.avatarFileName = avatarFileName;
+        this.avatarBase64 = avatarBase64;
         this.gender = gender;
         this.id = id;
         this.createdAt = createdAt;
@@ -82,14 +83,14 @@ public class UserDTO {
         this.password = password;
     }
 
-    public String getAvatarFileName() {
-        return avatarFileName;
+    public String getAvatarBase64() {
+        return avatarBase64;
     }
 
-    public void setAvatarFileName(String avatarFileName) {
-        this.avatarFileName = avatarFileName;
+    public void setAvatarBase64(String avatarBase64) {
+        this.avatarBase64 = avatarBase64;
     }
-
+    
     public Gender getGender() {
         return gender;
     }
@@ -120,6 +121,5 @@ public class UserDTO {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
+    } 
 }

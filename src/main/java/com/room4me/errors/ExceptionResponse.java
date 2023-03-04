@@ -10,7 +10,7 @@ public class ExceptionResponse {
     private String message;
     private int status;
 
-    public ExceptionResponse(HttpStatus error, String message) {
+    public ExceptionResponse(String message, HttpStatus error) {
         this.error = error;
         this.status = error.value();
         this.message = message;
@@ -21,7 +21,7 @@ public class ExceptionResponse {
         HttpStatus httpCode = exception.getHttpCode();
         String message = exception.getMessage();
 
-        return new ExceptionResponse(httpCode, message);
+        return new ExceptionResponse(message, httpCode);
     }
 
     public String getTimestamp() {

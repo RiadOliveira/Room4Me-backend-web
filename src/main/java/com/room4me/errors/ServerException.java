@@ -3,6 +3,9 @@ package com.room4me.errors;
 import org.springframework.http.HttpStatus;
 
 public class ServerException extends RuntimeException {
+    public static final ServerException INTERNAL_SERVER_EXCEPTION = 
+        new ServerException("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+
     private String message;
     private HttpStatus httpCode;
 

@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             message += errors.get(ind).getDefaultMessage();
         }
 
-        ExceptionResponse errorResponse = new ExceptionResponse(HttpStatus.BAD_REQUEST, message);
+        ExceptionResponse errorResponse = new ExceptionResponse(message, HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<>(errorResponse, status);
 	}
 }

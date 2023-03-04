@@ -28,7 +28,7 @@ public class AuthorizationExceptionParser {
         }
 
         ExceptionResponse parsedException = new ExceptionResponse(
-            status, parsedMessage
+            parsedMessage, status
         );
             
         ObjectMapper mapper = new ObjectMapper();
