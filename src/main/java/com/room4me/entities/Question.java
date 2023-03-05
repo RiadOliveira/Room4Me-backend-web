@@ -22,7 +22,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User questioner;
 
     @ManyToOne(fetch = FetchType.LAZY)

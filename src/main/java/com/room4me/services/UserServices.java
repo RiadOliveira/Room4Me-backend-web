@@ -16,6 +16,8 @@ import com.room4me.entities.User;
 import com.room4me.errors.ServerException;
 import com.room4me.repositories.UserRepository;
 import com.room4me.utils.ObjectPropsInjector;
+import com.room4me.utils.RepositoryUtils;
+import com.room4me.utils.UserUtils;
 
 @Service
 public class UserServices {
@@ -47,7 +49,7 @@ public class UserServices {
         if(avatar.isPresent()) {
             avatarUrl = fileAPIServices.sendFile(avatar.get());
             userToCreate.setAvatarLink(
-                fileAPIServices.getUniqueLinkPart(avatarUrl)
+                FileAPIServices.getUniqueLinkPart(avatarUrl)
             );
         }
         userToCreate.setPassword(
@@ -82,9 +84,7 @@ public class UserServices {
             );
         }
 
-        findedUser.setAvatarLink(
-            fileAPIServices.getFullLinkFromUniquePart(findedUser.getAvatarLink())
-        );
+        UserUtils.setCompleteUserAvatarLink(findedUser);
         return mapper.map(findedUser, UserDTO.class);
     }
 
@@ -108,23 +108,20 @@ public class UserServices {
         UUID userId, UserDTO userToUpdate,
         Optional<MultipartFile> avatar
     ) {
-        User findedUser = userRepository.findById(userId).orElse(null);
-        if(findedUser == null) {
-            throw new ServerException(
-                "User not found", HttpStatus.NOT_FOUND
-            );
-        }
+        User findedUser = RepositoryUtils.findEntityByIdOrThrowException(
+            userId, userRepository, User.class
+        );
         verifyEmailUpdate(
             userToUpdate.getEmail(), findedUser.getEmail()
         );
 
-        String fullUrl = fileAPIServices.getFullLinkFromUniquePart(
+        String fullUrl = FileAPIServices.getFullLinkFromUniquePart(
             findedUser.getAvatarLink()
         );
         if(avatar.isPresent()) {
             fullUrl = fileAPIServices.sendFile(avatar.get());
             userToUpdate.setAvatarLink(
-                fileAPIServices.getUniqueLinkPart(fullUrl)
+                FileAPIServices.getUniqueLinkPart(fullUrl)
             );
         }
         if(userToUpdate.getPassword() != null) {
@@ -148,16 +145,16 @@ public class UserServices {
     }
 
     public void deleteUser(UUID userId) {
+        RepositoryUtils.findEntityByIdOrThrowException(
+            userId, userRepository, User.class
+        );
         userRepository.deleteById(userId);
     }
 
     public void deleteAvatar(UUID userId) {
-        User findedUser = userRepository.findById(userId).orElse(null);
-        if(findedUser == null) {
-            throw new ServerException(
-                "User not found", HttpStatus.NOT_FOUND
-            );
-        }
+        User findedUser = RepositoryUtils.findEntityByIdOrThrowException(
+            userId, userRepository, User.class
+        );
 
         findedUser.setAvatarLink(null);
         userRepository.save(findedUser);

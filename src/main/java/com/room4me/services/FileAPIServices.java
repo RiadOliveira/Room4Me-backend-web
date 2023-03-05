@@ -20,7 +20,7 @@ public class FileAPIServices {
     @Autowired
     private Environment environment;
 
-    private final String API_ACCESS_URL = "https://i.ibb.co/";
+    private static final String API_ACCESS_URL = "https://i.ibb.co/";
     private final String API_UPLOAD_URL = "https://api.imgbb.com/1/upload?key=";
 
     private static class APIResponse {
@@ -56,12 +56,12 @@ public class FileAPIServices {
         }
     }
 
-    public String getUniqueLinkPart(String link) {
+    public static String getUniqueLinkPart(String link) {
         if(link == null) return null;
         return link.split(API_ACCESS_URL)[1];
     }
 
-    public String getFullLinkFromUniquePart(String uniquePart) {
+    public static String getFullLinkFromUniquePart(String uniquePart) {
         if(uniquePart == null) return null;
         return API_ACCESS_URL + uniquePart;
     }

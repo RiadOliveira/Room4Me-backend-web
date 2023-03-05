@@ -12,12 +12,17 @@ import com.room4me.entities.Contact;
 import com.room4me.entities.User;
 import com.room4me.errors.ServerException;
 import com.room4me.repositories.ContactRepository;
+import com.room4me.repositories.UserRepository;
 import com.room4me.utils.ObjectPropsInjector;
+import com.room4me.utils.RepositoryUtils;
 
 @Service
 public class ContactServices {
     @Autowired
     private ContactRepository contactRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ModelMapper mapper;
@@ -57,6 +62,10 @@ public class ContactServices {
     public ContactDTO updateUserContact(
         UUID userId, ContactDTO contactData
     ) {
+        User findedUser = RepositoryUtils.findEntityByIdOrThrowException(
+            userId, userRepository, User.class
+        );
+
         Contact findedContact = contactRepository.findByUserId(userId);
         ContactDTO mappedEntity = findedContact == null
             ? new ContactDTO() : mapper.map(findedContact, ContactDTO.class);
@@ -75,9 +84,7 @@ public class ContactServices {
         }
 
         Contact updatedContactEntity = mapper.map(contactData, Contact.class);
-        User userReference = new User();
-        userReference.setId(userId);
-        updatedContactEntity.setUser(userReference);
+        updatedContactEntity.setUser(findedUser);
 
         updatedContactEntity = contactRepository.save(updatedContactEntity);
         return mapper.map(updatedContactEntity, ContactDTO.class);
