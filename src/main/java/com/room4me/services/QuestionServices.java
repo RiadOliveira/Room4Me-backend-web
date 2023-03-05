@@ -63,7 +63,10 @@ public class QuestionServices {
         List<Question> findedQuestions = questionRepository.findAllByPropertyId(propertyId);
         
         return findedQuestions.stream().map(
-            question -> mapper.map(question, QuestionDTO.class)
+            question -> {
+                UserUtils.setCompleteUserAvatarLink(question.getQuestioner());
+                return mapper.map(question, QuestionDTO.class);
+            }
         ).collect(Collectors.toList());
     }
 
