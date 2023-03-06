@@ -30,13 +30,16 @@ public class PropertyServices {
   }
 
   public PropertyDTO update(UUID propertyId, PropertyDTO propertyToUpdate) {
-    Optional<Property> findedProperty = propertyRepository.findById(propertyId);
+    Optional<Property> findedPropertyOptional = propertyRepository.findById(propertyId);
 
-    if (!findedProperty.isPresent()) {
+    if (!findedPropertyOptional.isPresent()) {
       throw new PropertyNotFoundException("Property not found");
     }
 
+    Property findedProperty = findedPropertyOptional.get();
+
     mapper.map(propertyToUpdate, findedProperty);
+    propertyRepository.save(findedProperty);
 
     return propertyToUpdate;
   }
