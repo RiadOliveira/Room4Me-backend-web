@@ -1,6 +1,7 @@
 package com.room4me.dtos.property;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +16,17 @@ public class PropertyDTO {
   @JsonProperty(access = Access.READ_ONLY)
   private UUID id;
 
-  private UserWithContactDTO owner;
+  @JsonProperty(access = Access.READ_ONLY)
+  private UserWithContactDTO ownerWithContact;
+
+  @JsonProperty(access = Access.READ_ONLY)
+  private Set<ImageDTO> images;
+
+  @NotNull(message = "Address data required")
+  private AddressDTO address;
+
+  @NotNull(message = "Aspects data required")
+  private AspectsDTO aspects;
 
   @NotBlank(message = "Property title required")
   private String title;
@@ -46,20 +57,25 @@ public class PropertyDTO {
   }
 
   public PropertyDTO(
-    UUID id, String title, String rentPeriod, String description,
-    Date initialRentDate, Double rent, Date createdAt,
-    Date updatedAt, UserWithContactDTO owner, boolean availableToShare
+    UUID id, UserWithContactDTO ownerWithContact, AddressDTO address,
+    AspectsDTO aspects, Set<ImageDTO> images,
+    String title, String rentPeriod, String description,
+    Date initialRentDate, Double rent,
+    boolean availableToShare, Date createdAt, Date updatedAt
   ) {
     this.id = id;
+    this.ownerWithContact = ownerWithContact;
+    this.address = address;
+    this.aspects = aspects;
+    this.images = images;
     this.title = title;
     this.rentPeriod = rentPeriod;
     this.description = description;
     this.initialRentDate = initialRentDate;
     this.rent = rent;
+    this.availableToShare = availableToShare;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.owner = owner;
-    this.availableToShare = availableToShare;
   }
 
   public UUID getId() {
@@ -68,6 +84,30 @@ public class PropertyDTO {
 
   public void setId(UUID id) {
     this.id = id;
+  }
+
+  public UserWithContactDTO getOwnerWithContact() {
+    return ownerWithContact;
+  }
+
+  public void setOwnerWithContact(UserWithContactDTO ownerWithContact) {
+    this.ownerWithContact = ownerWithContact;
+  }
+
+  public AddressDTO getAddress() {
+    return address;
+  }
+
+  public void setAddress(AddressDTO address) {
+    this.address = address;
+  }
+
+  public AspectsDTO getAspects() {
+    return aspects;
+  }
+
+  public void setAspects(AspectsDTO aspects) {
+    this.aspects = aspects;
   }
 
   public String getTitle() {
@@ -110,6 +150,14 @@ public class PropertyDTO {
     this.rent = rent;
   }
 
+  public boolean isAvailableToShare() {
+    return availableToShare;
+  }
+
+  public void setAvailableToShare(boolean availableToShare) {
+    this.availableToShare = availableToShare;
+  }
+
   public Date getCreatedAt() {
     return createdAt;
   }
@@ -126,19 +174,11 @@ public class PropertyDTO {
     this.updatedAt = updatedAt;
   }
 
-  public UserWithContactDTO getOwner() {
-    return owner;
+  public Set<ImageDTO> getImages() {
+    return images;
   }
 
-  public void setOwner(UserWithContactDTO owner) {
-    this.owner = owner;
-  }
-
-  public boolean isAvailableToShare() {
-    return availableToShare;
-  }
-
-  public void setAvailableToShare(boolean availableToShare) {
-    this.availableToShare = availableToShare;
+  public void setImages(Set<ImageDTO> images) {
+    this.images = images;
   }
 }

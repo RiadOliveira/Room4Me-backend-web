@@ -11,10 +11,10 @@ public class AspectsDTO {
   @JsonProperty(access = Access.READ_ONLY)
   private UUID id;
 
-  private boolean shareWithSameGender;
-  private boolean acceptAnimals;
-  private boolean hasGarage;
-  private boolean furnished;
+  private boolean shareWithSameGender = false;
+  private boolean acceptAnimals = false;
+  private boolean hasGarage = false;
+  private boolean furnished = false;
 
   @Positive(message = "Bathrooms quantity must be positive")
   private Integer bathroomsQuantity;

@@ -19,7 +19,7 @@ public class Image {
     private UUID id;
 
     @Column(nullable = false)
-    private String fileName;
+    private String fileLink;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Property property;
@@ -28,9 +28,9 @@ public class Image {
         super();
     }
 
-    public Image(UUID id, String fileName, Property property) {
+    public Image(UUID id, String fileLink, Property property) {
         this.id = id;
-        this.fileName = fileName;
+        this.fileLink = fileLink;
         this.property = property;
     }
 
@@ -42,12 +42,12 @@ public class Image {
         this.id = id;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getFileLink() {
+        return fileLink;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setFileLink(String fileLink) {
+        this.fileLink = fileLink;
     }
 
     public Property getProperty() {

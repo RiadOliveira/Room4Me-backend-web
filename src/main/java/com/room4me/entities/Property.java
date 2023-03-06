@@ -42,10 +42,16 @@ public class Property {
     private Double rent;
     private boolean availableToShare;
     
-    @OneToOne(mappedBy = "property", cascade = CascadeType.REMOVE)
+    @OneToOne(
+        mappedBy = "property", cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private Address address;
 
-    @OneToOne(mappedBy = "property", cascade = CascadeType.REMOVE)
+    @OneToOne(
+        mappedBy = "property", cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private Aspects aspects;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.REMOVE)
