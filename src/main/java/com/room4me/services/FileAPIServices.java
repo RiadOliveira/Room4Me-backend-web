@@ -56,7 +56,7 @@ public class FileAPIServices {
         }
     }
 
-    public static String getUniqueLinkPart(String link) {
+    public static String getLinkUniquePart(String link) {
         if(link == null) return null;
         return link.split(API_ACCESS_URL)[1];
     }

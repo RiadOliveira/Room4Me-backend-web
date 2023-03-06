@@ -36,7 +36,7 @@ public class QuestionServices {
     @Autowired
     private ModelMapper mapper;
 
-    public QuestionDTO createQuestion(
+    public QuestionDTO create(
         UUID userId, CreateQuestionDTO questionToCreate
     ) {
         User findedUser = RepositoryUtils.findEntityByIdOrThrowException(
@@ -103,7 +103,7 @@ public class QuestionServices {
         return mapper.map(findedQuestion, QuestionDTO.class);
     }
 
-    public void deleteQuestion(UUID userId, UUID questionId) {
+    public void delete(UUID userId, UUID questionId) {
         RepositoryUtils.findEntityByIdOrThrowException(
             userId, userRepository, User.class
         );

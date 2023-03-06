@@ -33,7 +33,7 @@ public class UserServices {
     @Autowired
     private FileAPIServices fileAPIServices;
 
-    public UserDTO createUser(
+    public UserDTO create(
         UserDTO userToCreate, Optional<MultipartFile> avatar
     ) {
         boolean emailExists = userRepository.existsByEmail(
@@ -49,7 +49,7 @@ public class UserServices {
         if(avatar.isPresent()) {
             avatarUrl = fileAPIServices.sendFile(avatar.get());
             userToCreate.setAvatarLink(
-                FileAPIServices.getUniqueLinkPart(avatarUrl)
+                FileAPIServices.getLinkUniquePart(avatarUrl)
             );
         }
         userToCreate.setPassword(
@@ -67,7 +67,7 @@ public class UserServices {
         return userToCreate;
     }
 
-    public UserDTO createSessions(LoginDTO loginData) {
+    public UserDTO createSession(LoginDTO loginData) {
         User findedUser = userRepository.findByEmail(loginData.getEmail());
         if(findedUser == null) {
             throw new ServerException(
@@ -104,7 +104,7 @@ public class UserServices {
         }
     }
 
-    public UserDTO updateUser(
+    public UserDTO update(
         UUID userId, UserDTO userToUpdate,
         Optional<MultipartFile> avatar
     ) {
@@ -121,7 +121,7 @@ public class UserServices {
         if(avatar.isPresent()) {
             fullUrl = fileAPIServices.sendFile(avatar.get());
             userToUpdate.setAvatarLink(
-                FileAPIServices.getUniqueLinkPart(fullUrl)
+                FileAPIServices.getLinkUniquePart(fullUrl)
             );
         }
         if(userToUpdate.getPassword() != null) {
@@ -144,7 +144,7 @@ public class UserServices {
         return userToUpdate;
     }
 
-    public void deleteUser(UUID userId) {
+    public void delete(UUID userId) {
         RepositoryUtils.findEntityByIdOrThrowException(
             userId, userRepository, User.class
         );

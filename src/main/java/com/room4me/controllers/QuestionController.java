@@ -42,7 +42,7 @@ public class QuestionController {
         @RequestAttribute UUID userId,
         @RequestBody CreateQuestionDTO questionToCreate
     ) {
-        QuestionDTO response = questionServices.createQuestion(
+        QuestionDTO response = questionServices.create(
             userId, questionToCreate
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -65,7 +65,7 @@ public class QuestionController {
         @RequestAttribute UUID userId,
         @PathVariable UUID questionId
     ) {
-        questionServices.deleteQuestion(userId, questionId);
+        questionServices.delete(userId, questionId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

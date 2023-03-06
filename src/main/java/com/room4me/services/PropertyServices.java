@@ -10,14 +10,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.room4me.dtos.property.PropertyDTO;
+import com.room4me.dtos.user.ContactDTO;
+import com.room4me.dtos.user.UserDTO;
+import com.room4me.dtos.user.UserWithContactDTO;
+import com.room4me.entities.Contact;
 import com.room4me.entities.Property;
 import com.room4me.entities.User;
 import com.room4me.errors.ServerException;
-import com.room4me.repositories.ImageRepository;
 import com.room4me.repositories.PropertyRepository;
 import com.room4me.repositories.UserRepository;
 import com.room4me.utils.ObjectPropsInjector;
-import com.room4me.utils.RepositoryUtils;
+import com.room4me.utils.UserUtils;
 
 @Service
 public class PropertyServices {
@@ -28,17 +31,26 @@ public class PropertyServices {
   private UserRepository userRepository;
 
   @Autowired
-  private ImageRepository imageRepository;
+  private ImageServices imageServices;
 
   @Autowired
   private ModelMapper mapper;
 
   public PropertyDTO create(
-    UUID ownerId, PropertyDTO propertyToCreate
+    UUID userId, PropertyDTO propertyToCreate
   ) {
-    User findedUser = RepositoryUtils.findEntityByIdOrThrowException(
-      ownerId, userRepository, User.class
-    );
+    User findedUser = userRepository.findByIdWithContact(userId);
+    if(findedUser == null) {
+      throw new ServerException(
+        "User not found", HttpStatus.NOT_FOUND
+      );
+    }
+    if(findedUser.getContact() == null) {
+      throw new ServerException(
+        "User needs to have contact information to create a property",
+        HttpStatus.FORBIDDEN
+      );
+    }
 
     Property property = mapper.map(propertyToCreate, Property.class);
     property.setOwner(findedUser);
@@ -68,28 +80,56 @@ public class PropertyServices {
   }
 
   public List<PropertyDTO> findAll() {
-    List<Property> findedProperties = propertyRepository.findAllWithRelatedEntitiesExceptUser();
+    List<Property> findedProperties = propertyRepository
+      .findAllWithRelatedEntitiesExceptUser();
 
     return findedProperties.stream().map(
       property -> {
-        property.setImages(imageRepository.findByPropertyId(property.getId()));
+        property.setImages(
+          imageServices.findByPropertyIdWithParsedLink(property.getId())
+        );
         return mapper.map(property, PropertyDTO.class);
       }
     ).collect(Collectors.toList());
   }
 
+  private UserWithContactDTO getOwnerWithContactFromPropertyEntity(
+    Property propertyEntity
+  ) {
+    UserWithContactDTO ownerWithContact = new UserWithContactDTO();
+
+    User owner = propertyEntity.getOwner();
+    ownerWithContact.setUser(mapper.map(owner, UserDTO.class));
+
+    Contact ownerContact = owner.getContact();
+    ownerWithContact.setContact(
+      mapper.map(ownerContact, ContactDTO.class)
+    );
+
+    return ownerWithContact;
+  }
+
   public PropertyDTO findById(UUID propertyId) {
     Property findedProperty = propertyRepository
       .findByIdWithRelatedEntitiesAndOwnerContact(propertyId);
-
     if (findedProperty == null) {
       throw new ServerException(
         "Property not found", HttpStatus.NOT_FOUND
       );
     }
 
-    findedProperty.setImages(imageRepository.findByPropertyId(propertyId));
-    return mapper.map(findedProperty, PropertyDTO.class);
+    findedProperty.setImages(
+      imageServices.findByPropertyIdWithParsedLink(propertyId)
+    );
+    PropertyDTO parsedProperty = mapper.map(findedProperty, PropertyDTO.class);
+    
+    UserWithContactDTO ownerWithContact = getOwnerWithContactFromPropertyEntity(
+      findedProperty
+    );
+    UserUtils.setCompleteUserAvatarLink(ownerWithContact.getUser());
+    parsedProperty.setOwnerWithContact(ownerWithContact);
+
+    return parsedProperty;
   }
 
   public PropertyDTO update(
@@ -99,7 +139,9 @@ public class PropertyServices {
       propertyId
     );
     validatePropertyAndOwner(userId, findedProperty);
-    findedProperty.setImages(imageRepository.findByPropertyId(propertyId));
+    findedProperty.setImages(
+      imageServices.findByPropertyIdWithParsedLink(propertyId)
+    );
 
     PropertyDTO mappedEntity = mapper.map(findedProperty, PropertyDTO.class);
     ObjectPropsInjector.injectFromAnotherObject(
@@ -126,7 +168,7 @@ public class PropertyServices {
   }
 
   public void delete(UUID userId, UUID propertyId) {
-    Property findedProperty = propertyRepository.findByIdWithOwnerData(
+    Property findedProperty = propertyRepository.findByIdWithOwner(
       propertyId
     );
 

@@ -28,7 +28,7 @@ public interface PropertyRepository extends JpaRepository<Property, UUID> {
         "SELECT p FROM Property p LEFT JOIN FETCH p.owner o " +
         "WHERE p.id = ?1 "
     )
-    Property findByIdWithOwnerData(UUID id);
+    Property findByIdWithOwner(UUID id);
 
     @Query(
         "SELECT p FROM Property p LEFT JOIN FETCH p.address ad " +

@@ -37,7 +37,7 @@ public class UserController {
         @Valid @ModelAttribute UserDTO userToCreate,
         @RequestParam("avatar") Optional<MultipartFile> avatar
     ) {
-        UserDTO response = userServices.createUser(userToCreate, avatar);
+        UserDTO response = userServices.create(userToCreate, avatar);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -45,7 +45,7 @@ public class UserController {
     public ResponseEntity<?> createSessions(
         @Valid @RequestBody LoginDTO loginData
     ) {
-        UserDTO response = userServices.createSessions(loginData);
+        UserDTO response = userServices.createSession(loginData);
 
         String token = JwtUtils.generateToken(response.getId().toString());
         HttpHeaders headers = new HttpHeaders();
@@ -69,7 +69,7 @@ public class UserController {
         @Valid @ModelAttribute UserDTO userToUpdate,
         @RequestParam("avatar") Optional<MultipartFile> avatar
     ) {
-        UserDTO response = userServices.updateUser(
+        UserDTO response = userServices.update(
             userId, userToUpdate, avatar
         );
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -79,7 +79,7 @@ public class UserController {
     public ResponseEntity<?> deleteUser(
         @RequestAttribute UUID userId
     ) {
-        userServices.deleteUser(userId);
+        userServices.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
