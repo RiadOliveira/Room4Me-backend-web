@@ -52,7 +52,8 @@ public class Address {
     @Column(nullable = true)
     private String complement;
 
-    private int zipCode;
+    @Column(nullable = false)
+    private Integer zipCode;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -70,7 +71,7 @@ public class Address {
         String state, String city, String district,
         String street, String propertyNumber,
         String condominiumNumber, String block,
-        String complement, int zipCode,
+        String complement, Integer zipCode,
         Date createdAt, Date updatedAt
     ) {
         this.id = id;
@@ -177,11 +178,11 @@ public class Address {
         this.complement = complement;
     }
 
-    public int getZipCode() {
+    public Integer getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(int zipCode) {
+    public void setZipCode(Integer zipCode) {
         this.zipCode = zipCode;
     }
 

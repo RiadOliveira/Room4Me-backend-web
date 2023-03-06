@@ -38,7 +38,8 @@ public class Property {
     @Column(nullable = false)
     private Date initialRentDate;
     
-    private double rent;
+    @Column(nullable = false)
+    private Double rent;
     private boolean availableToShare;
     
     @OneToOne(mappedBy = "property", cascade = CascadeType.REMOVE)
@@ -67,7 +68,7 @@ public class Property {
     public Property(
         UUID id, String title, String rentPeriod,
         String description, Date initialRentDate,
-        double rent, boolean availableToShare,
+        Double rent, boolean availableToShare,
         Address address, Aspects aspects, Set<Image> images,
         User owner, Date createdAt, Date updatedAt
     ) {
@@ -126,11 +127,11 @@ public class Property {
         this.initialRentDate = initialRentDate;
     }
 
-    public double getRent() {
+    public Double getRent() {
         return rent;
     }
 
-    public void setRent(double rent) {
+    public void setRent(Double rent) {
         this.rent = rent;
     }
 
