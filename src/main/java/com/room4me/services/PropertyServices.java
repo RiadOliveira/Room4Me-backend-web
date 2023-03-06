@@ -35,7 +35,10 @@ public class PropertyServices {
     if (!findedProperty.isPresent()) {
       throw new PropertyNotFoundException("Property not found");
     }
-    return null;
+
+    mapper.map(propertyToUpdate, findedProperty);
+
+    return propertyToUpdate;
   }
 
   public void deleteProperty(UUID propertyId) {
