@@ -30,8 +30,8 @@ public class Aspects {
     private boolean hasGarage;
     private boolean furnished;
 
-    private int bathroomsQuantity;
-    private int bedroomsQuantity;
+    private Integer bathroomsQuantity;
+    private Integer bedroomsQuantity;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -48,7 +48,7 @@ public class Aspects {
         UUID id, Property property,
         boolean shareWithSameGender, boolean acceptAnimals,
         boolean hasGarage, boolean furnished,
-        int bathroomsQuantity, int bedroomsQuantity,
+        Integer bathroomsQuantity, Integer bedroomsQuantity,
         Date createdAt, Date updatedAt
     ) {
         this.id = id;
@@ -111,11 +111,11 @@ public class Aspects {
         this.furnished = furnished;
     }
 
-    public int getBathroomsQuantity() {
+    public Integer getBathroomsQuantity() {
         return bathroomsQuantity;
     }
 
-    public void setBathroomsQuantity(int bathroomsQuantity) {
+    public void setBathroomsQuantity(Integer bathroomsQuantity) {
         this.bathroomsQuantity = bathroomsQuantity;
     }
 
