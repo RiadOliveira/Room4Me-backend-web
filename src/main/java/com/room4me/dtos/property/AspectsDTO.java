@@ -5,17 +5,11 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.room4me.entities.Property;
-
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public class AspectsDTO {
   @JsonProperty(access = Access.READ_ONLY)
   private UUID id;
-
-  @NotNull(message = "Property is required")
-  private Property property;
 
   private boolean shareWithSameGender;
   private boolean acceptAnimals;
@@ -38,13 +32,13 @@ public class AspectsDTO {
     super();
   }
 
-  public AspectsDTO(UUID id, Property property, boolean shareWithSameGender,
-      boolean acceptAnimals, boolean hasGarage, boolean furnished,
-      Integer bathroomsQuantity,
-      Integer bedroomsQuantity, Date createdAt,
-      Date updatedAt) {
+  public AspectsDTO(
+    UUID id, boolean shareWithSameGender,
+    boolean acceptAnimals, boolean hasGarage, boolean furnished,
+    Integer bathroomsQuantity, Integer bedroomsQuantity,
+    Date createdAt, Date updatedAt
+  ) {
     this.id = id;
-    this.property = property;
     this.shareWithSameGender = shareWithSameGender;
     this.acceptAnimals = acceptAnimals;
     this.hasGarage = hasGarage;
@@ -61,14 +55,6 @@ public class AspectsDTO {
 
   public void setId(UUID id) {
     this.id = id;
-  }
-
-  public Property getProperty() {
-    return property;
-  }
-
-  public void setProperty(Property property) {
-    this.property = property;
   }
 
   public boolean isShareWithSameGender() {

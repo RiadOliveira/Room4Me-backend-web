@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.room4me.entities.User;
+import com.room4me.dtos.user.UserWithContactDTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +13,9 @@ import jakarta.validation.constraints.Positive;
 
 public class PropertyDTO {
   @JsonProperty(access = Access.READ_ONLY)
-  UUID id;
+  private UUID id;
+
+  private UserWithContactDTO owner;
 
   @NotBlank(message = "Property title required")
   private String title;
@@ -31,25 +33,23 @@ public class PropertyDTO {
   @Positive(message = "Rent must be positive")
   private Double rent;
 
+  private boolean availableToShare = false;
+
   @JsonProperty(access = Access.READ_ONLY)
   private Date createdAt;
 
   @JsonProperty(access = Access.READ_ONLY)
   private Date updatedAt;
 
-  @NotNull(message = "Owner required")
-  private User owner;
-
-  private boolean availableToShare;
-
   public PropertyDTO() {
     super();
   }
 
-  public PropertyDTO(UUID id, String title, String rentPeriod, String description,
-      Date initialRentDate,
-      Double rent,
-      Date createdAt, Date updatedAt, User owner, boolean availableToShare) {
+  public PropertyDTO(
+    UUID id, String title, String rentPeriod, String description,
+    Date initialRentDate, Double rent, Date createdAt,
+    Date updatedAt, UserWithContactDTO owner, boolean availableToShare
+  ) {
     this.id = id;
     this.title = title;
     this.rentPeriod = rentPeriod;
@@ -126,11 +126,11 @@ public class PropertyDTO {
     this.updatedAt = updatedAt;
   }
 
-  public User getOwner() {
+  public UserWithContactDTO getOwner() {
     return owner;
   }
 
-  public void setOwner(User owner) {
+  public void setOwner(UserWithContactDTO owner) {
     this.owner = owner;
   }
 

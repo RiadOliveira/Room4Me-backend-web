@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Positive;
 
 public class AddressDTO {
   @JsonProperty(access = Access.READ_ONLY)
-  UUID id;
+  private UUID id;
 
   @NotBlank(message = "Country required")
   private String country;

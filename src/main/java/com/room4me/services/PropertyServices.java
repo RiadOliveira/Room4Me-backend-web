@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.room4me.dtos.property.PropertyDTO;
 import com.room4me.entities.Property;
+import com.room4me.errors.ServerException;
 import com.room4me.repositories.PropertyRepository;
 
 import jakarta.el.PropertyNotFoundException;
@@ -23,20 +25,22 @@ public class PropertyServices {
   @Autowired
   private ModelMapper mapper;
 
-  public PropertyDTO createPropertyDTO(PropertyDTO propertyToCreate) {
+  public PropertyDTO createProperty(
+    UUID ownerId, PropertyDTO propertyToCreate
+  ) {
     Property property = mapper.map(propertyToCreate, Property.class);
     propertyRepository.save(property);
     return propertyToCreate;
   }
 
   public PropertyDTO update(UUID propertyId, PropertyDTO propertyToUpdate) {
-    Optional<Property> findedPropertyOptional = propertyRepository.findById(propertyId);
+    Property findedProperty = propertyRepository.findById(propertyId).orElse(null);
 
-    if (!findedPropertyOptional.isPresent()) {
-      throw new PropertyNotFoundException("Property not found");
+    if (findedProperty == null) {
+      throw new ServerException(
+        "Property not found", HttpStatus.NOT_FOUND
+      );
     }
-
-    Property findedProperty = findedPropertyOptional.get();
 
     mapper.map(propertyToUpdate, findedProperty);
     propertyRepository.save(findedProperty);
