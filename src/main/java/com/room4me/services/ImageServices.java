@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.room4me.dtos.property.DeleteMultipleImagesDTO;
 import com.room4me.dtos.property.ImageDTO;
 import com.room4me.entities.Image;
 import com.room4me.entities.Property;
@@ -73,8 +74,7 @@ public class ImageServices {
     }
 
     public List<ImageDTO> createToProperty(
-        UUID userId, UUID propertyId,
-        List<MultipartFile> images
+        UUID userId, UUID propertyId, List<MultipartFile> images
     ) {
         Property findedProperty = propertyRepository.findByIdWithOwner(
             propertyId
@@ -103,7 +103,7 @@ public class ImageServices {
         ).collect(Collectors.toList());
     }
 
-    public void delete(UUID userId, UUID imageId) {
+    private void validateImageAndPropertyOwner(UUID userId, UUID imageId) {
         Image findedImage = imageRepository.findByIdWithPropertyAndOwner(
             imageId
         );
@@ -114,7 +114,18 @@ public class ImageServices {
         }
 
         validatePropertyAndOwner(userId, findedImage.getProperty());
+    }
+
+    public void delete(UUID userId, UUID imageId) {
+        validateImageAndPropertyOwner(userId, imageId);
         imageRepository.deleteById(imageId);
+    }
+
+    public void deleteMultiple(UUID userId, DeleteMultipleImagesDTO imagesData) {
+        imagesData.getImagesIds().forEach(
+            imageId -> validateImageAndPropertyOwner(userId, imageId)
+        );
+        imageRepository.deleteAllById(imagesData.getImagesIds());
     }
 
     public Set<Image> findByPropertyIdWithParsedLink(UUID propertyId) {

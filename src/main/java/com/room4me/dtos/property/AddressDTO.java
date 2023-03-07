@@ -47,11 +47,13 @@ public class AddressDTO {
     super();
   }
 
-  public AddressDTO(UUID id, String country,
-      String state, String city, String district, String street,
-      String propertyNumber, String condominiumNumber, String block,
-      String complement, Integer zipCode, Date createdAt,
-      Date updatedAt) {
+  public AddressDTO(
+    UUID id, String country, String state, String city,
+    String district, String street, String propertyNumber,
+    String condominiumNumber, String block,
+    String complement, Integer zipCode,
+    Date createdAt, Date updatedAt
+  ) {
     this.id = id;
     this.country = country;
     this.state = state;
