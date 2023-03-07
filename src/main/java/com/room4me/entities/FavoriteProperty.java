@@ -16,17 +16,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "images")
-public class Image {
+@Table(name = "favorite_properties")
+public class FavoriteProperty {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private String fileLink;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Property property;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -35,17 +35,17 @@ public class Image {
     @UpdateTimestamp
     private Date updatedAt;
 
-    public Image() {
+    public FavoriteProperty() {
         super();
     }
 
-    public Image(
-        UUID id, String fileLink, Property property,
+    public FavoriteProperty(
+        UUID id, Property property, User user,
         Date createdAt, Date updatedAt
     ) {
         this.id = id;
-        this.fileLink = fileLink;
         this.property = property;
+        this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -58,20 +58,20 @@ public class Image {
         this.id = id;
     }
 
-    public String getFileLink() {
-        return fileLink;
-    }
-
-    public void setFileLink(String fileLink) {
-        this.fileLink = fileLink;
-    }
-
     public Property getProperty() {
         return property;
     }
 
     public void setProperty(Property property) {
         this.property = property;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Date getCreatedAt() {

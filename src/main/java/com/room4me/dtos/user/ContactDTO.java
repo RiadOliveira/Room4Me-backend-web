@@ -1,5 +1,6 @@
 package com.room4me.dtos.user;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.hibernate.validator.constraints.URL;
@@ -32,19 +33,28 @@ public class ContactDTO {
     @URL(message = "Invalid URL format")
     private String instagram;
 
+    @JsonProperty(access = Access.READ_ONLY)
+    private Date createdAt;
+
+    @JsonProperty(access = Access.READ_ONLY)
+    private Date updatedAt;
+
     public ContactDTO() {
         super();
     }
 
     public ContactDTO(
         UUID id, String email, String callNumber,
-        String whatsappNumber, String instagram
+        String whatsappNumber, String instagram,
+        Date createdAt, Date updatedAt
     ) {
         this.id = id;
         this.email = email;
         this.callNumber = callNumber;
         this.whatsappNumber = whatsappNumber;
         this.instagram = instagram;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public UUID getId() {
@@ -85,5 +95,21 @@ public class ContactDTO {
 
     public void setInstagram(String instagram) {
         this.instagram = instagram;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

@@ -36,6 +36,9 @@ public class User {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
     private Set<Property> properties;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private Set<FavoriteProperty> favoriteProperties;
+
     @Column(unique = true, nullable = false)
 	private String email;
 
@@ -67,6 +70,7 @@ public class User {
         Set<Property> properties, String email,
         String name, String password,
         Gender gender, String avatarLink,
+        Set<FavoriteProperty> favoriteProperties,
         Date createdAt, Date updatedAt
     ) {
         this.id = id;
@@ -77,6 +81,7 @@ public class User {
         this.password = password;
         this.gender = gender;
         this.avatarLink = avatarLink;
+        this.favoriteProperties = favoriteProperties;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

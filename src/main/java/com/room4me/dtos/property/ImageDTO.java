@@ -1,5 +1,6 @@
 package com.room4me.dtos.property;
 
+import java.util.Date;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,15 +15,24 @@ public class ImageDTO {
   @NotBlank(message = "File name required")
   private String fileLink;
 
+  @JsonProperty(access = Access.READ_ONLY)
+  private Date createdAt;
+
+  @JsonProperty(access = Access.READ_ONLY)
+  private Date updatedAt;
+
   public ImageDTO() {
     super();
   }
 
   public ImageDTO(
-    UUID id, String fileLink
+    UUID id, String fileLink,
+    Date createdAt, Date updatedAt
   ) {
     this.id = id;
     this.fileLink = fileLink;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 
   public UUID getId() {
@@ -39,5 +49,21 @@ public class ImageDTO {
 
   public void setFileLink(String fileLink) {
     this.fileLink = fileLink;
+  }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Date getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Date updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }

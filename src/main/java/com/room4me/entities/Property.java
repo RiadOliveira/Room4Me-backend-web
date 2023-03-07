@@ -59,6 +59,9 @@ public class Property {
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.REMOVE)
     private Set<Question> questions;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.REMOVE)
+    private Set<FavoriteProperty> favoriteProperties;
     
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
@@ -79,8 +82,8 @@ public class Property {
         String description, Date initialRentDate,
         Double rent, boolean availableToShare,
         Address address, Aspects aspects, Set<Image> images,
-        Set<Question> questions, User owner,
-        Date createdAt, Date updatedAt
+        Set<Question> questions, Set<FavoriteProperty> favoriteProperties,
+        User owner, Date createdAt, Date updatedAt
     ) {
         this.id = id;
         this.title = title;
@@ -93,6 +96,7 @@ public class Property {
         this.aspects = aspects;
         this.images = images;
         this.questions = questions;
+        this.favoriteProperties = favoriteProperties;
         this.owner = owner;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -208,5 +212,13 @@ public class Property {
 
     public void setQuestions(Set<Question> questions) {
         this.questions = questions;
+    }
+
+    public Set<FavoriteProperty> getFavoriteProperties() {
+        return favoriteProperties;
+    }
+
+    public void setFavoriteProperties(Set<FavoriteProperty> favoriteProperties) {
+        this.favoriteProperties = favoriteProperties;
     }
 }

@@ -1,6 +1,10 @@
 package com.room4me.entities;
 
+import java.util.Date;
 import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +37,13 @@ public class Contact {
     @Column(unique = true, nullable = true)
     private String instagram;
 
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Date createdAt;
+
+    @UpdateTimestamp
+    private Date updatedAt;
+
     public Contact() {
         super();
     }
@@ -40,7 +51,8 @@ public class Contact {
     public Contact(
         UUID id, User user, String email,
         String callNumber, String whatsappNumber,
-        String instagram
+        String instagram, Date createdAt,
+        Date updatedAt
     ) {
         this.id = id;
         this.user = user;
@@ -48,6 +60,8 @@ public class Contact {
         this.callNumber = callNumber;
         this.whatsappNumber = whatsappNumber;
         this.instagram = instagram;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public UUID getId() {
@@ -96,5 +110,21 @@ public class Contact {
 
     public void setInstagram(String instagram) {
         this.instagram = instagram;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
