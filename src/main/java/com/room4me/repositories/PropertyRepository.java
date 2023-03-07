@@ -35,4 +35,12 @@ public interface PropertyRepository extends JpaRepository<Property, UUID> {
         "LEFT JOIN FETCH p.aspects as "
     )
     List<Property> findAllWithRelatedEntitiesExceptUser();
+
+    @Query(
+        "SELECT p FROM Property p LEFT JOIN FETCH p.address ad " +
+        "LEFT JOIN FETCH p.aspects as WHERE p.owner.id = ?1 "
+    )
+    List<Property> findAllByUserIdWithRelatedEntitiesExceptUser(
+        UUID id
+    );
 }

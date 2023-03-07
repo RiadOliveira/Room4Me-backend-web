@@ -93,6 +93,20 @@ public class PropertyServices {
     ).collect(Collectors.toList());
   }
 
+  public List<PropertyDTO> findAllByUserId(UUID userId) {
+    List<Property> findedProperties = propertyRepository
+      .findAllByUserIdWithRelatedEntitiesExceptUser(userId);
+    
+    return findedProperties.stream().map(
+      property -> {
+        property.setImages(
+          imageServices.findByPropertyIdWithParsedLink(property.getId())
+        );
+        return mapper.map(property, PropertyDTO.class);
+      }
+    ).collect(Collectors.toList());
+  }
+
   private UserWithContactDTO getOwnerWithContactFromPropertyEntity(
     Property propertyEntity
   ) {
