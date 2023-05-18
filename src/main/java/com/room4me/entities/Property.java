@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.room4me.enumerators.PropertyTitle;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +29,7 @@ public class Property {
     private UUID id;
 
     @Column(nullable = false)
-    private String title;
+    private PropertyTitle title;
     
     @Column(nullable = false)
     private String rentPeriod;
@@ -78,7 +80,7 @@ public class Property {
     }
 
     public Property(
-        UUID id, String title, String rentPeriod,
+        UUID id, PropertyTitle title, String rentPeriod,
         String description, Date initialRentDate,
         Double rent, boolean availableToShare,
         Address address, Aspects aspects, Set<Image> images,
@@ -110,11 +112,11 @@ public class Property {
         this.id = id;
     }
 
-    public String getTitle() {
+    public PropertyTitle getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(PropertyTitle title) {
         this.title = title;
     }
 
